@@ -39,17 +39,30 @@
     window.onload = function() {
       // Begin Swagger UI call region
       const ui = SwaggerUIBundle({
-        url: "https://petstore.swagger.io/v2/swagger.json",
+        url: "./openapi.yml",
         dom_id: '#swagger-ui',
         deepLinking: true,
+        defaultModelExpandDepth: 2,
+        defaultModelRendering: 'model',
+        defaultModelsExpandDepth: -1,
+        displayOperationId: true,
+        displayRequestDuration: true,
+        docExpansion: 'none',
+        filter: true,
+        layout: "StandaloneLayout",
+        operationsSorter: (a, b) => a.get("operation").get("operationId").localeCompare(b.get("operation").get("operationId")),
+        plugins: [
+          SwaggerUIBundle.plugins.DownloadUrl
+        ],
         presets: [
           SwaggerUIBundle.presets.apis,
           SwaggerUIStandalonePreset
         ],
-        plugins: [
-          SwaggerUIBundle.plugins.DownloadUrl
-        ],
-        layout: "StandaloneLayout"
+        showAlternativeSchemaExample: true,
+        showCommonExtensions: true,
+        showExtensions: true,
+        tagsSorter: 'alpha',
+        validatorUrl: ''
       })
       // End Swagger UI call region
 
