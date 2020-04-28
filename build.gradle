@@ -1,0 +1,31 @@
+plugins {
+  id 'idea'
+  id 'distribution'
+  id 'maven-publish'
+  id 'com.github.node-gradle.node' version '2.2.3'
+}
+
+group = 'com.github.soberich'
+version = 'master-SNAPSHOT'
+
+node {
+  version = '12.16.3'
+  download = true
+}
+
+distributions {
+  main {
+    contents {
+      from tasks.named('npm_run_build') //just to create dependency between tasks.
+      from 'dist'
+    }
+  }
+}
+
+publishing {
+  publications {
+    mavenJava(MavenPublication) {
+      artifact distZip
+    }
+  }
+}
