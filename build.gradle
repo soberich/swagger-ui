@@ -2,15 +2,23 @@ plugins {
   id 'idea'
   id 'distribution'
   id 'maven-publish'
+  id 'com.jfrog.bintray' version '1.8.5'
   id 'com.github.node-gradle.node' version '2.2.3'
 }
 
 group = 'com.github.soberich'
-version = 'master-SNAPSHOT'
+version = 'master'
 
 node {
   version = '12.16.3'
   download = true
+}
+
+tasks.register("webJar", Jar) {
+  dependsOn(tasks.named('npm_run_build'))
+  from(fileTree("dist")) {
+    into "META-INF/resources/openapi-ui"
+  }
 }
 
 distributions {
@@ -24,8 +32,53 @@ distributions {
 
 publishing {
   publications {
-    mavenJava(MavenPublication) {
+    mavenWebJar(MavenPublication) {
       artifact distZip
+      artifact webJar
+      pom {
+        name = 'Swagger UI'
+        description = 'Swagger-UI latest builds with partial `oneOf` rendering support and code syntax highlight.'
+        properties = [
+          'project.build.sourceEncoding': "UTF-8",
+          'upstream.url': 'https://github.com/soberich/swagger-ui/archive/master.zip',
+          requirejs: '{"paths": { "swagger-ui": "swagger-ui" }}'
+        ]
+        licenses {
+          license {
+            name = 'The Apache License, Version 2.0'
+            url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+            distribution = 'repo'
+          }
+        }
+        developers {
+          developer {
+            id = 'soberich'
+            email = '25544967+soberich@users.noreply.github.com'
+          }
+        }
+        scm {
+          connection = 'scm:git@github.com:soberich/swagger-ui.git'
+          developerConnection = 'scm:git:ssh://github.com/soberich/swagger-ui.git'
+        }
+      }
+    }
+  }
+}
+
+bintray {
+  publications = ['mavenWebJar']
+  publish = true
+  override = true
+  pkg {
+    repo = 'maven'
+    name = 'com.github.soberich:swagger-ui'
+    userOrg = 'soberich'
+    licenses = ['Apache-2.0']
+    vcsUrl = 'https://github.com/soberich/swagger-ui.git'
+    version {
+      name = 'master'
+      desc = 'Swagger-UI latest builds with partial `oneOf` rendering support and code syntax highlight.'
+      released  = new Date()
     }
   }
 }
